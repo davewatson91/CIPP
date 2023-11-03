@@ -22,6 +22,7 @@ import { CippPage } from 'src/components/layout/CippPage'
 import { useLazyGenericGetRequestQuery } from 'src/store/api/app'
 import { OnChange } from 'react-final-form-listeners'
 import { queryString } from 'src/helpers'
+import { cellGenericFormatter } from 'src/components/tables/CellGenericFormat'
 
 const GraphExplorer = () => {
   let navigate = useNavigate()
@@ -63,6 +64,7 @@ const GraphExplorer = () => {
         selector: (row) => row[`${value.toString()}`],
         sortable: true,
         exportSelector: value,
+        cell: cellGenericFormatter(),
       }),
     )
     QueryColumns.set = true
@@ -107,12 +109,20 @@ const GraphExplorer = () => {
             <CCardHeader>
               <CCardTitle className="d-flex justify-content-between">
                 Report Settings
-                <CButton size="sm" variant="ghost" onClick={() => setVisibleA(!visibleA)}>
+                <CButton
+                  size="sm"
+                  variant="ghost"
+                  className="stretched-link"
+                  onClick={() => setVisibleA(!visibleA)}
+                >
                   <FontAwesomeIcon icon={visibleA ? faChevronDown : faChevronRight} />
                 </CButton>
               </CCardTitle>
             </CCardHeader>
-            <CCollapse visible={visibleA}>
+          </CCard>
+          <CCollapse visible={visibleA}>
+            <CCard className="options-card">
+              <CCardHeader></CCardHeader>
               <CCardBody>
                 <Form
                   initialValues={{
@@ -168,6 +178,11 @@ const GraphExplorer = () => {
                                     'directoryRoles/roleTemplateId=62e90394-69f5-4237-9190-012177145e10/members',
                                 },
                                 {
+                                  label: 'Multifactor Authentication Report for Admins',
+                                  value:
+                                    '/reports/authenticationMethods/userRegistrationDetails?$filter=IsAdmin eq true',
+                                },
+                                {
                                   label: 'Secure Score with Current Score and Max Score',
                                   value:
                                     'security/secureScores?$top=90&$select=currentscore,maxscore,activeusercount,enabledservices',
@@ -203,8 +218,8 @@ const GraphExplorer = () => {
                   }}
                 />
               </CCardBody>
-            </CCollapse>
-          </CCard>
+            </CCard>
+          </CCollapse>
         </CCol>
       </CRow>
       <hr />
@@ -218,6 +233,7 @@ const GraphExplorer = () => {
             <CCardBody>
               <CippTable
                 reportName="GraphExplorer"
+                dynamicColumns={false}
                 columns={QueryColumns.data}
                 data={graphrequest.data}
                 isFetching={graphrequest.isFetching}
